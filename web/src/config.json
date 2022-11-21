@@ -1,0 +1,11 @@
+{
+  "welcome": [
+    "These docs will guide you through integrating with Opennode and demonstrate how to use out product",
+    "In addition to these docs, you can also find helpful information about integrating with Opennode in our <a href='https://google.de' target='_blank'>Help Center</a>",
+    "<br />",
+    "<b>The docs are organized into four main groups:</b>",
+    "<ul><a href=''><li>Charges</li></a><a href=''><li>Withdrawals</li></a><a href=''><li>Rates</li></a><a href=''><li>Currencies</li></a></ul>"
+  ],
+  "hostedAt": "/",
+  "apiBase": "https://api.opennode.co"
+}

@@ -1,0 +1,308 @@
+@import "../../Utils/globals";
+
+#Layout {
+  display: flex;
+  height: 100%;
+  $SidebarWidth: 250px;
+  $ExamplebarWidth: 600px;
+  $ExamplebarTime: 0.25s;
+  .Sidebar {
+    height: 100%;
+    width: $SidebarWidth;
+    background-color: rgba($color: white, $alpha: 0.2);
+    padding: 20px;
+    box-sizing: border-box;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px,
+      rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px,
+      rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+    img {
+      width: 35px;
+      border-radius: 10px;
+    }
+    &__Item {
+      margin-top: 30px;
+      span {
+        display: block;
+        user-select: none;
+      }
+      & > span {
+        opacity: 0.8;
+        font-size: 12px;
+        margin-bottom: 8px;
+      }
+      &__Children {
+        span {
+          font-size: 15px;
+          transition: 0.1s ease-in-out;
+          cursor: pointer;
+          padding: 3px 0;
+          border-left: 3px solid transparent;
+          margin-left: -3px;
+          &:hover {
+            transform: translateX(10px);
+          }
+          &.active {
+            padding-left: 10px;
+            transform: none;
+            box-sizing: border-box;
+            border-left-color: $sec;
+            color: white;
+          }
+        }
+      }
+    }
+  }
+  .Examplebar {
+    height: 100%;
+    width: $ExamplebarWidth;
+    transition: $ExamplebarTime ease-in-out;
+    background-color: $secBg;
+    position: absolute;
+    top: 0;
+    right: 0;
+    box-sizing: border-box;
+    transform: translateX(100%);
+    overflow-y: auto;
+    .section {
+      margin: 0 30px;
+    }
+    h4 {
+      font-weight: 900;
+    }
+    * {
+      color: $onSecBg;
+    }
+    &__Container {
+      position: relative;
+      padding: 110px 0;
+    }
+    &.active {
+      transform: none;
+    }
+    .req-route {
+      font-family: "Courier New", Courier, monospace;
+      padding: 4px 8px;
+      border-radius: 5px;
+    }
+    .req-method {
+      background-color: rgba($color: black, $alpha: 0.5);
+      padding: 4px 8px;
+      border-radius: 5px;
+      color: $blue;
+      margin-right: 10px;
+      font-size: 15px;
+      &.method-POST {
+        color: $green;
+      }
+      &.method-PUT {
+        color: $orange;
+      }
+      &.method-DELETE {
+        color: $red;
+      }
+      &.method-PATCH {
+        color: $yellow;
+      }
+    }
+    .times {
+      position: absolute;
+      top: 40px;
+      left: 30px;
+      cursor: pointer;
+      width: min-content;
+      height: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      svg {
+        transition: 0.1s ease-in-out;
+        fill: $onSecBg;
+        width: 18px;
+      }
+      &:hover {
+        svg {
+          transform: scale(1.1);
+        }
+      }
+    }
+    code.headers {
+      display: block;
+      background-color: rgba($color: black, $alpha: 0.5);
+      padding: 15px 20px;
+      border-radius: 10px;
+      * {
+        font-family: "Courier New", Courier, monospace;
+      }
+      .k {
+        color: rgba($color: $lightblue, $alpha: 0.7);
+      }
+      .v {
+        color: rgba($color: $lightgreen, $alpha: 0.7);
+      }
+      div {
+        margin-top: 3px;
+        &:first-child {
+          margin-top: 0;
+        }
+      }
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      $leftSide: 40%;
+      * {
+        color: white;
+      }
+      thead tr th,
+      tbody tr td {
+        text-align: left;
+        vertical-align: top;
+        padding: 15px 20px;
+        width: 100% - $leftSide;
+      }
+
+      thead tr th {
+        border-bottom: 1px solid rgba($color: white, $alpha: 0.25);
+        font-size: 16px;
+        font-weight: 100;
+      }
+      tbody tr td {
+        border-bottom: 1px solid rgba($color: white, $alpha: 0.1);
+        code {
+          display: block;
+          background-color: rgba($color: black, $alpha: 0.5);
+          width: max-content;
+          padding: 4px 8px;
+          font-size: 14px;
+          border-radius: 5px;
+          margin-top: 5px;
+        }
+      }
+      thead tr th:first-child,
+      tbody tr td:first-child {
+        text-align: right;
+        width: $leftSide;
+      }
+      tbody tr td:last-child {
+        color: #868788;
+        font-size: 15px;
+      }
+      tbody tr td:first-child {
+        font-family: "Courier New", Courier, monospace;
+        span {
+          display: block;
+          font-family: "Courier New", Courier, monospace;
+          color: #868788;
+        }
+      }
+    }
+  }
+  main {
+    height: 100%;
+    width: calc(100% - $SidebarWidth);
+    transition: width $ExamplebarTime ease-in-out;
+    &.examplebar-active {
+      width: calc(100% - ($SidebarWidth + $ExamplebarWidth));
+    }
+    & > div {
+      height: 100%;
+      width: 100%;
+      padding: 60px 40px 0 40px;
+      box-sizing: border-box;
+    }
+    h4 {
+      opacity: 0.9;
+    }
+    h1 {
+      font-weight: 900;
+      color: white;
+    }
+    ul {
+      li {
+        margin-bottom: 10px;
+      }
+    }
+    a {
+      color: lighten($sec, 3);
+      li {
+        color: lighten($sec, 3);
+      }
+    }
+    .Rendered_Content {
+      margin-bottom: 15px;
+    }
+    .Request_Component {
+      padding: 10px;
+      box-sizing: border-box;
+      background-color: $secBg;
+      border-radius: 5px;
+      position: relative;
+      margin-bottom: 5px;
+      &.active {
+        background-color: $pri;
+      }
+      .req-infos {
+        display: flex;
+        align-items: center;
+        .req-method {
+          margin-right: 15px;
+          font-size: 14px;
+          height: 23px;
+          padding: 0 8px;
+          display: inline-flex;
+          justify-content: center;
+          align-items: center;
+          box-sizing: border-box;
+          color: black;
+          font-weight: 700;
+          border-radius: 5px;
+          background-color: $blue;
+          &.method-POST {
+            background-color: $green;
+          }
+          &.method-PUT {
+            background-color: $orange;
+          }
+          &.method-DELETE {
+            background-color: $red;
+          }
+          &.method-PATCH {
+            background-color: $yellow;
+          }
+        }
+        .req-route {
+          font-size: 17px;
+          font-weight: 500;
+          color: white;
+          .req-short-desc {
+            font-size: 14px;
+            margin-left: 20px;
+          }
+        }
+      }
+      .req-open-example {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        svg {
+          transition: 0.1s ease-in-out;
+          fill: $onSecBg;
+          width: 13px;
+        }
+        &:hover {
+          svg {
+            transform: scale(1.1);
+          }
+        }
+      }
+    }
+  }
+}

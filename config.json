@@ -1,0 +1,6 @@
+{
+  "logo": "./logo.png",
+  "folders": ["./test"],
+  "hostedAt": "/",
+  "apiBase": "https://api.opennode.co"
+}

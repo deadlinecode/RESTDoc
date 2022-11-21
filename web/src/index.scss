@@ -1,0 +1,73 @@
+@import "./Utils/globals";
+
+html,
+body,
+#root,
+#root > div {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  background-color: $bg;
+  overflow-x: hidden;
+}
+
+@font-face {
+  font-family: "WorkSans";
+  src: url(./Media/Fonts/WorkSans.ttf) format("truetype");
+}
+
+* {
+  color: $onBg;
+  font-family: WorkSans;
+  font-weight: 100;
+  outline: none !important;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 5px 0;
+}
+
+b {
+  font-weight: 900;
+  color: white;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid rgba($color: gray, $alpha: 0.4);
+  margin: 25px 0;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 15px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+  padding: 5px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 9999px;
+  border: 4px solid transparent;
+  background-clip: padding-box;
+  transition: all 0.2s;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #aaaaaa;
+  border-radius: 9999px;
+  border: 4px solid transparent;
+  background-clip: padding-box;
+}
