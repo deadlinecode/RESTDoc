@@ -1,6 +1,12 @@
 {
   "logo": "./logo.png",
   "folders": ["./test"],
+  "extraPages": [
+    {
+      "title": "Kategorie",
+      "folder": "./testPages"
+    }
+  ],
   "hostedAt": "/",
   "apiBase": "https://api.opennode.co"
 }

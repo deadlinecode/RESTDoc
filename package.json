@@ -11,5 +11,9 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^18.11.9"
+  },
+  "dependencies": {
+    "chokidar": "^3.5.3",
+    "node-html-parser": "^6.1.4"
   }
 }

@@ -131,7 +131,35 @@ namespace S2S_TeamsApp.Controllers
         }
 
         // RESTDOC_START
-        // test
+        // 
+        // col = Charges Endpoints
+        // title = Charge collectionawefawefawef
+        // shortDesc = Generate a chargeawfawef
+        // route = /v1/chargesaefw
+        // method = DELETE
+        // 
+        // DESC_START
+        // Use this endpoint to generate a chrage. This charge is payable through the Lightning Network or an on-chain bitcoin transaction.
+        // DESC_END
+        // 
+        // BODY_START
+        // id | number | Id of a post.
+        // description | string | Charge description.
+        // amount | number | Charge's price in satoshis, unless currency parameter is used.
+        // currency | string | Charge's currency `USD/EUR/GBP/MXN/BRL/AUD`
+        // order_id | string | External order ID (use your platform ID).
+        // email | string | Customer's email.
+        // name | string | Customer's name.
+        // callback_url | string | URL to recieve webhooks `https://site.com/?handler=opennode`
+        // success_url | string | URL to redirect the user after payment `https://site.com/order/abc123`
+        // auto_settle | boolean | Indicates if this charge should be exchange to merchant's native currency.
+        // BODY_END
+        // 
+        // HEADERS_START
+        // Content-Type | application/json
+        // Authorization | API-Key
+        // HEADERS_END
+        // 
         // RESTDOC_END
         [HttpPost("HasPermissions")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -156,12 +184,32 @@ namespace S2S_TeamsApp.Controllers
         // RESTDOC_START
         // 
         // col = Charges Endpoints
-        // 
         // title = Charge collection
+        // shortDesc = Generate a charge
+        // route = /v1/charges
+        // method = POST
+        // 
+        // DESC_START
+        // Use this endpoint to generate a chrage. This charge is payable through the Lightning Network or an on-chain bitcoin transaction.
+        // DESC_END
         // 
         // BODY_START
-        // id | number | Id of a post
+        // id | number | Id of a post.
+        // description | string | Charge description.
+        // amount | number | Charge's price in satoshis, unless currency parameter is used.
+        // currency | string | Charge's currency `USD/EUR/GBP/MXN/BRL/AUD`
+        // order_id | string | External order ID (use your platform ID).
+        // email | string | Customer's email.
+        // name | string | Customer's name.
+        // callback_url | string | URL to recieve webhooks `https://site.com/?handler=opennode`
+        // success_url | string | URL to redirect the user after payment `https://site.com/order/abc123`
+        // auto_settle | boolean | Indicates if this charge should be exchange to merchant's native currency.
         // BODY_END
+        // 
+        // HEADERS_START
+        // Content-Type | application/json
+        // Authorization | API-Key
+        // HEADERS_END
         // 
         // RESTDOC_END
         [HttpPost("updateContent")]

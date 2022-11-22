@@ -16,8 +16,8 @@
       rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px,
       rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
     img {
-      width: 35px;
-      border-radius: 10px;
+      width: 40px;
+      border-radius: 5px;
     }
     &__Item {
       margin-top: 30px;
@@ -34,7 +34,7 @@
         span {
           font-size: 15px;
           transition: 0.1s ease-in-out;
-          cursor: pointer;
+          cursor: pointer !important;
           padding: 3px 0;
           border-left: 3px solid transparent;
           margin-left: -3px;
@@ -241,6 +241,18 @@
       margin-bottom: 5px;
       &.active {
         background-color: $pri;
+      }
+      .rendered-by {
+        position: absolute;
+        top: 5px;
+        right: 0;
+        transform: translateY(-100%);
+        color: black;
+        font-weight: 700;
+        font-size: 14px;
+        padding: 5px 10px;
+        border-radius: 5px;
+        background-color: $red;
       }
       .req-infos {
         display: flex;

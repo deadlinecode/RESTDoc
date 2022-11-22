@@ -7,6 +7,8 @@ import "./Layout.scss";
 import Icon from "../../Utils/Components/Icon/Icon";
 
 interface IReq {
+  path?: string;
+  lines?: string;
   route: string;
   method: "POST" | "GET" | "PUT" | "PATCH" | "DELETE";
   shortDesc: string;
@@ -115,6 +117,7 @@ export default class Layout extends React.Component<
         >
           <Icon icon="chevron-right" />
         </div>
+        {req.path && <div className="rendered-by">{req.path}:{req.lines}</div>}
       </div>
     );
   };
