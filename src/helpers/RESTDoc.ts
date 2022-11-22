@@ -3,13 +3,17 @@ import chokidar from "chokidar";
 import path from "path";
 import Fx from "../Utils/Fx";
 import { parse as html } from "node-html-parser";
+import pkg from "../../package.json";
+import { createServer, build } from "vite";
+import react from "@vitejs/plugin-react";
 
 export interface IConfig {
   logo: string;
   folders: string[];
+  apiBase: string;
+  productName: string;
   welcome?: string[];
   hostedAt?: string;
-  apiBase?: string;
   generatedDefsTitle?: string;
   extraPages?: { title: string; folder: string }[];
   colors?: {
@@ -44,6 +48,7 @@ interface INode {
 
 class RESTDoc {
   static instance = new RESTDoc();
+  private isDev = false;
   private nodes: INode[] = [];
   private parseCache: { path: string; content: any }[] = [];
   private extParseChache: {
@@ -51,7 +56,17 @@ class RESTDoc {
     folder: string;
     items: { title: string; path: string; body: string[] }[];
   }[] = [];
-  private constructor() {}
+  private folderWatch?: chokidar.FSWatcher;
+  private extraPagesWatch?: chokidar.FSWatcher;
+  private constructor() {
+    if (process.env.NODE_ENV === "development") return;
+    process.on("uncaughtException", (err) => {
+      process.stdout.write("\u001b[3J\u001b[1J");
+      console.clear();
+      console.log(err.message);
+      process.exit(1);
+    });
+  }
 
   private readDir = async (dir: string) => {
     await Promise.all(
@@ -89,56 +104,167 @@ class RESTDoc {
       });
   };
 
+  private watchFolders = (config: IConfig) => {
+    this.folderWatch?.close();
+    (this.folderWatch = chokidar.watch(config.folders, {
+      depth: 99,
+    })).on("change", async (path) => {
+      process.stdout.write("\u001b[3J\u001b[1J");
+      console.clear();
+      console.log(
+        `\x1b[46m\x1b[30m REBUILD \x1b[0m '${path}' changed. Building...`
+      );
+      const start = new Date().getTime();
+      await this.parseFile(path);
+      await this.parse(config, true, path);
+      const end = new Date(new Date().getTime() - start);
+      console.log(
+        `\x1b[46m\x1b[30m REBUILD \x1b[0m Done in ${end.getMilliseconds()} ms`
+      );
+    });
+  };
+
+  private watchExtraPages = (config: IConfig) => {
+    this.extraPagesWatch?.close();
+    (this.extraPagesWatch = chokidar.watch(
+      (config.extraPages as NonNullable<typeof config.extraPages>).map(
+        (x) => x.folder
+      ),
+      { depth: 1 }
+    )).on("change", async (file, stats) => {
+      const folder =
+        file.startsWith("/") || file.startsWith("C:") ? file : `./${file}`;
+      if (!config.extraPages?.find((x) => x.folder === path.dirname(folder)))
+        return;
+      process.stdout.write("\u001b[3J\u001b[1J");
+      console.clear();
+      console.log(
+        `\x1b[46m\x1b[30m REBUILD \x1b[0m '${file}' changed. Building...`
+      );
+      const start = new Date().getTime();
+      await this.parseExt(
+        config,
+        true,
+        config.extraPages?.find((x) => x.folder === path.dirname(folder))
+      );
+      const end = new Date(new Date().getTime() - start);
+      console.log(
+        `\x1b[46m\x1b[30m REBUILD \x1b[0m Done in ${end.getMilliseconds()} ms`
+      );
+    });
+  };
+
   dev = async (config: IConfig) => {
-    // TODO: check for file deletion
-    console.log("Building...");
+    this.isDev = true;
+    console.log("Starting...");
     const start = new Date().getTime();
+    try {
+      await this.execConfig(config);
+    } catch (err) {
+      return console.log((err as Error).message);
+    }
     await this.index(config.folders);
     await this.parseExt(config);
     await this.parse(config, true);
+    chokidar.watch("./config.json").on("change", async () => {
+      process.stdout.write("\u001b[3J\u001b[1J");
+      console.clear();
+      console.log(
+        `\x1b[46m\x1b[30m REBUILD \x1b[0m Config changed. Building...`
+      );
+      const start = new Date().getTime(),
+        content = (await fs.readFile("./config.json")).toString();
+      var newConfig: IConfig;
+      try {
+        newConfig = JSON.parse(content);
+      } catch {
+        return console.log(
+          `\x1b[41m\x1b[30m ERROR \x1b[0m Couldn't parse config!`
+        );
+      }
+      try {
+        await this.execConfig(config);
+      } catch (err) {
+        return console.log((err as Error).message);
+      }
+
+      if (
+        newConfig.folders.some((x) => !config.folders.includes(x)) ||
+        config.folders.some((x) => !newConfig.folders.includes(x))
+      )
+        this.watchFolders(newConfig);
+
+      if (
+        newConfig.extraPages === undefined &&
+        config.extraPages !== undefined &&
+        this.extraPagesWatch
+      ) {
+        this.extraPagesWatch.close();
+        this.extraPagesWatch = undefined;
+      }
+
+      if (
+        (newConfig.extraPages !== undefined &&
+          config.extraPages === undefined) ||
+        (newConfig.extraPages !== undefined &&
+          config.extraPages !== undefined &&
+          (newConfig.extraPages.some((x) =>
+            (config.extraPages as NonNullable<typeof config.extraPages>).find(
+              (y) => y.folder === x.folder
+            )
+          ) ||
+            config.extraPages.some((x) =>
+              (
+                newConfig.extraPages as NonNullable<typeof newConfig.extraPages>
+              ).find((y) => y.folder === x.folder)
+            )))
+      )
+        this.watchExtraPages(newConfig);
+
+      config = newConfig;
+      await this.index(config.folders);
+      await this.parseExt(config);
+      await this.parse(config, true);
+      const end = new Date(new Date().getTime() - start);
+      console.log(
+        `\x1b[46m\x1b[30m REBUILD \x1b[0m Done in ${end.getMilliseconds()} ms`
+      );
+    });
+    config.extraPages && this.watchExtraPages(config);
+    this.watchFolders(config);
+    await (
+      await createServer({
+        plugins: [react()],
+        server: {
+          port: 3000,
+        },
+        root: Fx.res("./web"),
+        logLevel: "silent",
+      })
+    ).listen();
     const end = new Date(new Date().getTime() - start);
     process.stdout.write("\u001b[3J\u001b[1J");
     console.clear();
-    console.log(`Build done (${end.getSeconds()}.${end.getMilliseconds()}s)`);
-    chokidar.watch("./config.json").on("change", async () => {
-      const config = JSON.parse(
-        (await fs.readFile("./config.json")).toString()
-      );
-      await this.index(config.folders);
-      // TODO: Rewach ext with the new config --> close old listeners
-      await this.parseExt(config);
-      await this.parse(config, true);
-    });
-    // TODO: Add extraPages to hot reload
-    // config.extraPages && chokidar.watch(config.extraPages, { depth: 1 });
-    chokidar
-      .watch(config.folders, {
-        depth: 99,
-      })
-      .on("change", async (path) => {
-        process.stdout.write("\u001b[3J\u001b[1J");
-        console.clear();
-        console.log("Building...");
-        const start = new Date().getTime();
-        await this.parseFile(path);
-        await this.parse(config, true, path);
-        const end = new Date(new Date().getTime() - start);
-        process.stdout.write("\u001b[3J\u001b[1J");
-        console.clear();
-        console.log(
-          `Build done (${end.getSeconds()}.${end.getMilliseconds()}s)`
-        );
-      });
+    console.log(
+      `\n  \x1b[1m\x1b[32m${pkg.name} v${
+        pkg.version
+      } \x1b[0m\x1b[2m ready in\x1b[0m ${end.getMilliseconds()} ms\n\n  Preview at http://localhost:3000\n  \x1b[2mWaiting for changes...\x1b[0m`
+    );
   };
 
   index = (folders: string[]) =>
     Promise.all(folders.map((f) => this.readDir(f)));
 
-  private parseExt = async (config: IConfig) => {
+  private parseExt = async (
+    config: IConfig,
+    directRender?: boolean,
+    page?: NonNullable<IConfig["extraPages"]>[number]
+  ) => {
     if (!config.extraPages) return;
+    !page && (this.extParseChache = []);
     await Promise.all(
-      config.extraPages.map(async (x) =>
-        this.extParseChache.push({
+      (page ? [page] : config.extraPages).map(async (x) => {
+        const elm = {
           title: x.title,
           folder: x.folder,
           items: (
@@ -157,13 +283,33 @@ class RESTDoc {
               )
                 .filter((y) => !y.isDir && y.path.endsWith(".html"))
                 .map(async (y) => {
-                  const parsed = html((await fs.readFile(y.path)).toString()),
-                    title = parsed.querySelector("html head title")?.innerText,
+                  var parsed = html((await fs.readFile(y.path)).toString());
+                  parsed.querySelectorAll("html body pre[req]").forEach((x) => {
+                    var data: any;
+                    try {
+                      data = JSON.parse(
+                        x.innerHTML
+                          .trim()
+                          .replace(/\r/g, "")
+                          .split("\n")
+                          .map((x) => x.trimStart())
+                          .join(" ")
+                      );
+                    } catch {
+                      return;
+                    }
+                    data.path = y.path;
+                    !this.isDev && delete data.path;
+                    data.lines && delete data.lines;
+                    x.replaceWith(`REQ_DEF:${JSON.stringify(data)}`);
+                  });
+                  const title =
+                      parsed.querySelector("html head title")?.innerText,
                     body = parsed.querySelector("html body")?.innerHTML;
                   if (!(title && body)) return undefined;
                   return {
                     title,
-                    path: y.path,
+                    path: this.isDev ? y.path : undefined,
                     body: body
                       .trim()
                       .split("\n")
@@ -172,7 +318,31 @@ class RESTDoc {
                 })
             )
           ).filter((x) => x !== undefined) as any,
-        })
+        };
+        page && this.extParseChache.find((x) => x.folder === page.folder)
+          ? (this.extParseChache = this.extParseChache.map((x) =>
+              x.folder === page.folder ? elm : x
+            ))
+          : this.extParseChache.push(elm);
+      })
+    );
+    if (!directRender) return;
+    await fs.writeFile(
+      "./.web/items.json",
+      JSON.stringify(
+        [
+          {
+            title: config.generatedDefsTitle || "API Reference",
+            items: this.parseCache.map((x) => x.content),
+          },
+          ...this.extParseChache.map((x) => ({
+            ...x,
+            folder: undefined,
+            items: x.items.map((y) => ({ ...y, path: undefined })),
+          })),
+        ],
+        null,
+        2
       )
     );
   };
@@ -262,15 +432,18 @@ class RESTDoc {
       );
     cached &&
       path &&
-      (parsed = [...this.parseCache.filter((x) => x.path === path), ...parsed]);
+      (parsed = [
+        ...this.parseCache.filter((x) => x.path === path).map((x) => x.content),
+        ...parsed,
+      ]);
     cached &&
       (this.parseCache = parsed.map((x) => ({
         path: x.path,
         lines: x.lines,
         content: x,
       })));
-    fs.writeFile(
-      "./web/src/items.json",
+    await fs.writeFile(
+      "./.web/items.json",
       JSON.stringify(
         [
           {
@@ -292,9 +465,15 @@ class RESTDoc {
   private checkConfig = (config: IConfig) =>
     (
       [
-        [() => !config.logo, "Logo is required"],
-        [() => !config.logo.endsWith(".png"), "Logo must be png"],
-        [() => !config.folders, "Folders is required"],
+        [() => !config.logo, "logo is required"],
+        [() => !config.logo.endsWith(".png"), "logo must be png"],
+        [() => !config.folders, "folders is required"],
+        [() => !config.apiBase, "apiBase is required"],
+        [() => !config.productName, "productName is required"],
+        [
+          () => typeof config.productName !== "string",
+          "productName has to be a string",
+        ],
         [
           () =>
             typeof config.folders !== "object" ||
@@ -333,7 +512,7 @@ class RESTDoc {
           "Color value has to be a string",
         ],
         [
-          () => config.apiBase && typeof config.apiBase !== "string",
+          () => typeof config.apiBase !== "string",
           "apiBase has to be a string",
         ],
         [
@@ -363,7 +542,8 @@ class RESTDoc {
         ],
       ] as const
     ).forEach(([check, err]) => {
-      if (check()) throw new Error(`[ CONFIG ERROR ] ${err}`);
+      if (check())
+        throw new Error(`\x1b[41m\x1b[30m CONFIG ERROR \x1b[0m ${err}`);
     });
 
   private execConfig = async (config: IConfig) => {
@@ -376,9 +556,7 @@ class RESTDoc {
     // Replacing config
     //
     if (config.colors && Object.entries(config.colors).length) {
-      var colors = (
-          await fs.readFile("./web/src/Utils/_globals.scss")
-        ).toString(),
+      var colors = (await fs.readFile("./.web/_globals.scss")).toString(),
         changed = false;
       const replaceColor = (k: string, v: string) =>
         (colors = colors
@@ -390,7 +568,7 @@ class RESTDoc {
           })
           .join(";"));
       Object.entries(config.colors).forEach(([k, v]) =>
-        replaceColor(`$${k}`, v)
+        replaceColor(`$${k}`, v as string)
       );
       changed && (await fs.writeFile("./web/src/Utils/_globals.scss", colors));
     }
@@ -398,16 +576,22 @@ class RESTDoc {
     //
     // Replacing the logo
     //
-    await fs.copyFile(config.logo, "./web/public/logo.png");
+    await fs.copyFile(config.logo, "./.web/logo.png");
 
     //
     // Replace internal config
     //
+    if (
+      !(await Fx.fs_utils.exists(
+        path.join(process.cwd(), "./.web/config.json")
+      ))
+    )
+      await fs.copyFile(Fx.res("./config.json"), "./.web/config.json");
     var internalConfig = JSON.parse(
-        (await fs.readFile("./web/src/config.json")).toString()
+        (await fs.readFile("./.web/config.json")).toString()
       ),
       changed = false;
-    (["welcome", "hostedAt", "apiBase"] as const).forEach(
+    (["welcome", "hostedAt", "apiBase", "productName"] as const).forEach(
       (x) => config[x] && (changed = true) && (internalConfig[x] = config[x])
     );
     internalConfig.apiBase = internalConfig.apiBase.slice(
@@ -415,16 +599,32 @@ class RESTDoc {
     );
     changed &&
       (await fs.writeFile(
-        "./web/src/config.json",
+        "./.web/config.json",
         JSON.stringify(internalConfig, null, 2)
       ));
   };
 
-  start = async (config: IConfig) => {
+  private buildInternal = () =>
+    build({
+      root: "./web",
+      build: {
+        outDir: "./build",
+      },
+      base: "./",
+      logLevel: "silent",
+    });
+
+  build = async (config: IConfig) => {
     if (!this.nodes.length) throw new Error("Nothing to parse");
+    console.log("Reading config...");
     await this.execConfig(config);
+    config.extraPages && console.log("Parsing extra pages...");
     await this.parseExt(config);
+    console.log("Parsing folders...");
     await this.parse(config);
+    console.log("Building files...");
+    await this.buildInternal();
+    console.log("\nDone!");
   };
 }
 

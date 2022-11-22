@@ -1,0 +1,44 @@
+[
+  {
+    "title": "API Reference",
+    "items": [
+      {
+        "title": "Charges Endpoints",
+        "body": [
+          "<h3>Charge collectionawefawefawef</h3>",
+          "REQ_DEF:{\"path\":\"test\\\\DataController.cs\",\"lines\":\"133-165\",\"route\":\"/v1/chargesaefw\",\"method\":\"GET\",\"shortDesc\":\"Generate a chargeawfawef\",\"headers\":{\"Content-Type\":\"application/json\",\"Authorization\":\"API-Key\",\"Manuel\":\"Hurensohn\"},\"body\":[{\"attr\":\"id\",\"type\":\"number\",\"desc\":\"Id of a post.\"},{\"attr\":\"description\",\"type\":\"string\",\"desc\":\"Charge description.\"},{\"attr\":\"amount\",\"type\":\"number\",\"desc\":\"Charge's price in satoshis, unless currency parameter is used.\"},{\"attr\":\"currency\",\"type\":\"string\",\"desc\":\"Charge's currency `USD/EUR/GBP/MXN/BRL/AUD`\"},{\"attr\":\"order_id\",\"type\":\"string\",\"desc\":\"External order ID (use your platform ID).\"},{\"attr\":\"email\",\"type\":\"string\",\"desc\":\"Customer's email.\"},{\"attr\":\"name\",\"type\":\"string\",\"desc\":\"Customer's name.\"},{\"attr\":\"callback_url\",\"type\":\"string\",\"desc\":\"URL to recieve webhooks `https://site.com/?handler=opennode`\"},{\"attr\":\"success_url\",\"type\":\"string\",\"desc\":\"URL to redirect the user after payment `https://site.com/order/abc123`\"},{\"attr\":\"auto_settle\",\"type\":\"boolean\",\"desc\":\"Indicates if this charge should be exchange to merchant's native currency.\"}]}",
+          "Use this endpoint to generate a chrage. This charge is payable through the Lightning Network or an on-chain bitcoin transaction.",
+          "Du kleiner Hurenoshn",
+          "<br />",
+          "<h3>Charge collection</h3>",
+          "REQ_DEF:{\"path\":\"test\\\\DataController.cs\",\"lines\":\"186-216\",\"route\":\"/v1/charges\",\"method\":\"POST\",\"shortDesc\":\"Generate a charge\",\"headers\":{\"Content-Type\":\"application/json\",\"Authorization\":\"API-Key\"},\"body\":[{\"attr\":\"id\",\"type\":\"number\",\"desc\":\"Id of a post.\"},{\"attr\":\"description\",\"type\":\"string\",\"desc\":\"Charge description.\"},{\"attr\":\"amount\",\"type\":\"number\",\"desc\":\"Charge's price in satoshis, unless currency parameter is used.\"},{\"attr\":\"currency\",\"type\":\"string\",\"desc\":\"Charge's currency `USD/EUR/GBP/MXN/BRL/AUD`\"},{\"attr\":\"order_id\",\"type\":\"string\",\"desc\":\"External order ID (use your platform ID).\"},{\"attr\":\"email\",\"type\":\"string\",\"desc\":\"Customer's email.\"},{\"attr\":\"name\",\"type\":\"string\",\"desc\":\"Customer's name.\"},{\"attr\":\"callback_url\",\"type\":\"string\",\"desc\":\"URL to recieve webhooks `https://site.com/?handler=opennode`\"},{\"attr\":\"success_url\",\"type\":\"string\",\"desc\":\"URL to redirect the user after payment `https://site.com/order/abc123`\"},{\"attr\":\"auto_settle\",\"type\":\"boolean\",\"desc\":\"Indicates if this charge should be exchange to merchant's native currency.\"}]}",
+          "Use this endpoint to generate a chrage. This charge is payable through the Lightning Network or an on-chain bitcoin transaction."
+        ]
+      }
+    ]
+  },
+  {
+    "title": "Kategorie",
+    "items": [
+      {
+        "title": "Test",
+        "body": [
+          "Dies das Annananas",
+          "<h1>toll</h1>",
+          "<pre>test</pre>",
+          "REQ_DEF:{\"route\":\"/v1/chargesaefw\",\"method\":\"GET\",\"shortDesc\":\"Generate a chargeawfawef\",\"headers\":{\"Content-Type\":\"application/json\",\"Authorization\":\"API-Key\",\"Manuel\":\"Hurensohn\"},\"body\":[{\"attr\":\"id\",\"type\":\"number\",\"desc\":\"Id of a post.\"},{\"attr\":\"description\",\"type\":\"string\",\"desc\":\"Charge description.\"},{\"attr\":\"amount\",\"type\":\"number\",\"desc\":\"Charge's price in satoshis, unless currency parameter is used.\"},{\"attr\":\"currency\",\"type\":\"string\",\"desc\":\"Charge's currency `USD/EUR/GBP/MXN/BRL/AUD`\"},{\"attr\":\"order_id\",\"type\":\"string\",\"desc\":\"External order ID (use your platform ID).\"},{\"attr\":\"email\",\"type\":\"string\",\"desc\":\"Customer's email.\"},{\"attr\":\"name\",\"type\":\"string\",\"desc\":\"Customer's name.\"},{\"attr\":\"callback_url\",\"type\":\"string\",\"desc\":\"URL to recieve webhooks `https://site.com/?handler=opennode`\"},{\"attr\":\"success_url\",\"type\":\"string\",\"desc\":\"URL to redirect the user after payment `https://site.com/order/abc123`\"},{\"attr\":\"auto_settle\",\"type\":\"boolean\",\"desc\":\"Indicates if this charge should be exchange to merchant's native currency.\"}],\"path\":\"testPages\\\\asdf.html\"}"
+        ]
+      },
+      {
+        "title": "Document",
+        "body": [
+          "<h3>Weis was ich</h3>",
+          "asdf",
+          "<ul>",
+          "<li>Hurensohn</li>",
+          "</ul>"
+        ]
+      }
+    ]
+  }
+]

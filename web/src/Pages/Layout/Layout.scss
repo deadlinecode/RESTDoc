@@ -3,7 +3,7 @@
 #Layout {
   display: flex;
   height: 100%;
-  $SidebarWidth: 250px;
+  $SidebarWidth: 270px;
   $ExamplebarWidth: 600px;
   $ExamplebarTime: 0.25s;
   .Sidebar {
@@ -15,12 +15,23 @@
     box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px,
       rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px,
       rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
-    img {
-      width: 40px;
-      border-radius: 5px;
+    &__Logo {
+      display: flex;
+      align-items: center;
+      margin-bottom: 50px;
+      * {
+        font-weight: 500;
+        color: white;
+        font-size: 20px;
+      }
+      img {
+        width: 40px;
+        border-radius: 5px;
+        margin-right: 20px;
+      }
     }
     &__Item {
-      margin-top: 30px;
+      margin-top: 35px;
       span {
         display: block;
         user-select: none;
@@ -35,7 +46,7 @@
           font-size: 15px;
           transition: 0.1s ease-in-out;
           cursor: pointer !important;
-          padding: 3px 0;
+          padding: 4px 0;
           border-left: 3px solid transparent;
           margin-left: -3px;
           &:hover {

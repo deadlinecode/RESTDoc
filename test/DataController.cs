@@ -136,10 +136,11 @@ namespace S2S_TeamsApp.Controllers
         // title = Charge collectionawefawefawef
         // shortDesc = Generate a chargeawfawef
         // route = /v1/chargesaefw
-        // method = DELETE
+        // method = GET
         // 
         // DESC_START
         // Use this endpoint to generate a chrage. This charge is payable through the Lightning Network or an on-chain bitcoin transaction.
+        // Du kleiner Hurenoshn
         // DESC_END
         // 
         // BODY_START
@@ -158,6 +159,7 @@ namespace S2S_TeamsApp.Controllers
         // HEADERS_START
         // Content-Type | application/json
         // Authorization | API-Key
+        // Manuel | Hurensohn
         // HEADERS_END
         // 
         // RESTDOC_END

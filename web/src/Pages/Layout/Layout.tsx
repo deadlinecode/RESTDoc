@@ -1,10 +1,11 @@
 import * as React from "react";
 import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
-import config from "../../config.json";
+import config from "../../../../.web/config.json";
 import Fx from "../../Utils/Fx";
-import paragraphs from "../../items.json";
+import paragraphs from "../../../../.web/items.json";
 import "./Layout.scss";
 import Icon from "../../Utils/Components/Icon/Icon";
+import logo from "../../../../.web/logo.png";
 
 interface IReq {
   path?: string;
@@ -117,7 +118,12 @@ export default class Layout extends React.Component<
         >
           <Icon icon="chevron-right" />
         </div>
-        {req.path && <div className="rendered-by">{req.path}:{req.lines}</div>}
+        {req.path && (
+          <div className="rendered-by">
+            {req.path}
+            {req.lines && `:${req.lines}`}
+          </div>
+        )}
       </div>
     );
   };
@@ -136,7 +142,21 @@ export default class Layout extends React.Component<
         <hr />
         {paragraphItem.body.map((x, i) =>
           x.startsWith("REQ_DEF:") ? (
-            this.renderReq(JSON.parse(x.slice("REQ_DEF:".length)))
+            (() => {
+              try {
+                return this.renderReq(JSON.parse(x.slice("REQ_DEF:".length)));
+              } catch (err) {
+                try {
+                  return this.renderReq(
+                    JSON.parse(x.slice("REQ_DEF:".length).replace(/\\/g, ""))
+                  );
+                } catch (err) {
+                  console.log(x);
+                  console.error(err);
+                  return null;
+                }
+              }
+            })()
           ) : (
             <div
               key={i}
@@ -182,7 +202,10 @@ export default class Layout extends React.Component<
             render={(props) => (
               <div id="Layout">
                 <div className="Sidebar">
-                  <img src="./logo.png" alt="" />
+                  <div className="Sidebar__Logo">
+                    <img src={logo} alt="" />
+                    <h3>{config.productName}</h3>
+                  </div>
                   {isWelcome && (
                     <div className="Sidebar__Item">
                       <span>Welcome</span>

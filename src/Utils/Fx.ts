@@ -1,6 +1,25 @@
+import path from "path";
+import fs from "fs/promises";
+
 class Fx {
   static instance = new Fx();
   private constructor() {}
+
+  fs_utils = {
+    exists: async (path: string) => {
+      try {
+        await fs.stat(path);
+      } catch {
+        return false;
+      }
+      return true;
+    },
+  };
+
+  res = (relativePath: string) =>
+    path.resolve(
+      path.join(path.dirname((require.main as any).filename), "..", relativePath)
+    );
 
   mergeNodes = (arr: any[], sep: string, merge: string) => {
     const clone: any[] = [];

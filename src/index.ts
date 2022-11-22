@@ -1,11 +1,22 @@
-import config from "../config.json";
+import fs from "fs/promises";
+import path from "path";
 import RESTDoc from "./helpers/RESTDoc";
+import Fx from "./Utils/Fx";
 
 process.stdout.write("\u001b[3J\u001b[1J");
 console.clear();
 
 (async () => {
-  if (process.argv.slice(2).some((x) => x === "--dev")) return RESTDoc.dev(config);
+  if (
+    !(await Fx.fs_utils.exists(path.join(process.cwd(), "./.web/items.json")))
+  )
+    await fs.writeFile("./.web/items.json", "[]");
+
+  const config = JSON.parse(
+    (await fs.readFile(path.join(process.cwd(), "./config.json"))).toString()
+  );
+  if (process.argv.slice(2).some((x) => x === "--dev"))
+    return RESTDoc.dev(config);
   await RESTDoc.index(config.folders);
-  await RESTDoc.start(config);
+  await RESTDoc.build(config);
 })();
