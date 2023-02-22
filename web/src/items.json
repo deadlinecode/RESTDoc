@@ -3,40 +3,63 @@
     "title": "API Reference",
     "items": [
       {
-        "title": "Charges Endpoints",
+        "title": "Teams",
         "body": [
-          "<h3>Charge collectionawefawefawef</h3>",
-          "REQ_DEF:{\"route\":\"/v1/chargesaefw\",\"method\":\"GET\",\"shortDesc\":\"Generate a chargeawfawef\",\"headers\":{\"Content-Type\":\"application/json\",\"Authorization\":\"API-Key\",\"Manuel\":\"Hurensohn\"},\"body\":[{\"attr\":\"id\",\"type\":\"number\",\"desc\":\"Id of a post.\"},{\"attr\":\"description\",\"type\":\"string\",\"desc\":\"Charge description.\"},{\"attr\":\"amount\",\"type\":\"number\",\"desc\":\"Charge's price in satoshis, unless currency parameter is used.\"},{\"attr\":\"currency\",\"type\":\"string\",\"desc\":\"Charge's currency `USD/EUR/GBP/MXN/BRL/AUD`\"},{\"attr\":\"order_id\",\"type\":\"string\",\"desc\":\"External order ID (use your platform ID).\"},{\"attr\":\"email\",\"type\":\"string\",\"desc\":\"Customer's email.\"},{\"attr\":\"name\",\"type\":\"string\",\"desc\":\"Customer's name.\"},{\"attr\":\"callback_url\",\"type\":\"string\",\"desc\":\"URL to recieve webhooks `https://site.com/?handler=opennode`\"},{\"attr\":\"success_url\",\"type\":\"string\",\"desc\":\"URL to redirect the user after payment `https://site.com/order/abc123`\"},{\"attr\":\"auto_settle\",\"type\":\"boolean\",\"desc\":\"Indicates if this charge should be exchange to merchant's native currency.\"}]}",
-          "Use this endpoint to generate a chrage. This charge is payable through the Lightning Network or an on-chain bitcoin transaction.",
-          "Du kleiner Hurenoshn",
+          "<h3>Create a team</h3>",
+          "REQ_DEF:{\"path\":\"test\\\\DataController.cs\",\"lines\":\"26-47\",\"title\":\"Create a team\",\"route\":\"/api/v1.0/teams\",\"method\":\"POST\",\"headers\":{\"Content-Type\":\"application/json\",\"Authorization\":\"Bearer XXX\"},\"body\":[{\"attr\":\"ApproveDenyComment\",\"type\":\"string\",\"desc\":\"A reason for the approval of the request\",\"optional\":false},{\"attr\":\"AppliedPolicy\",\"type\":\"number\",\"desc\":\"Optional\",\"optional\":false}]}",
+          "Use this endpoint to create a team",
           "<br />",
-          "<h3>Charge collection</h3>",
-          "REQ_DEF:{\"route\":\"/v1/charges\",\"method\":\"POST\",\"shortDesc\":\"Generate a charge\",\"headers\":{\"Content-Type\":\"application/json\",\"Authorization\":\"API-Key\"},\"body\":[{\"attr\":\"id\",\"type\":\"number\",\"desc\":\"Id of a post.\"},{\"attr\":\"description\",\"type\":\"string\",\"desc\":\"Charge description.\"},{\"attr\":\"amount\",\"type\":\"number\",\"desc\":\"Charge's price in satoshis, unless currency parameter is used.\"},{\"attr\":\"currency\",\"type\":\"string\",\"desc\":\"Charge's currency `USD/EUR/GBP/MXN/BRL/AUD`\"},{\"attr\":\"order_id\",\"type\":\"string\",\"desc\":\"External order ID (use your platform ID).\"},{\"attr\":\"email\",\"type\":\"string\",\"desc\":\"Customer's email.\"},{\"attr\":\"name\",\"type\":\"string\",\"desc\":\"Customer's name.\"},{\"attr\":\"callback_url\",\"type\":\"string\",\"desc\":\"URL to recieve webhooks `https://site.com/?handler=opennode`\"},{\"attr\":\"success_url\",\"type\":\"string\",\"desc\":\"URL to redirect the user after payment `https://site.com/order/abc123`\"},{\"attr\":\"auto_settle\",\"type\":\"boolean\",\"desc\":\"Indicates if this charge should be exchange to merchant's native currency.\"}]}",
-          "Use this endpoint to generate a chrage. This charge is payable through the Lightning Network or an on-chain bitcoin transaction."
-        ]
-      }
-    ]
-  },
-  {
-    "title": "Kategorie",
-    "items": [
-      {
-        "title": "Test",
-        "body": [
-          "Dies das Annananas",
-          "<h1>toll</h1>",
-          "<pre>test</pre>",
-          "REQ_DEF:{\"route\":\"/v1/chargesaefw\",\"method\":\"GET\",\"shortDesc\":\"Generate a chargeawfawef\",\"headers\":{\"Content-Type\":\"application/json\",\"Authorization\":\"API-Key\",\"Manuel\":\"Hurensohn\"},\"body\":[{\"attr\":\"id\",\"type\":\"number\",\"desc\":\"Id of a post.\"},{\"attr\":\"description\",\"type\":\"string\",\"desc\":\"Charge description.\"},{\"attr\":\"amount\",\"type\":\"number\",\"desc\":\"Charge's price in satoshis, unless currency parameter is used.\"},{\"attr\":\"currency\",\"type\":\"string\",\"desc\":\"Charge's currency `USD/EUR/GBP/MXN/BRL/AUD`\"},{\"attr\":\"order_id\",\"type\":\"string\",\"desc\":\"External order ID (use your platform ID).\"},{\"attr\":\"email\",\"type\":\"string\",\"desc\":\"Customer's email.\"},{\"attr\":\"name\",\"type\":\"string\",\"desc\":\"Customer's name.\"},{\"attr\":\"callback_url\",\"type\":\"string\",\"desc\":\"URL to recieve webhooks `https://site.com/?handler=opennode`\"},{\"attr\":\"success_url\",\"type\":\"string\",\"desc\":\"URL to redirect the user after payment `https://site.com/order/abc123`\"},{\"attr\":\"auto_settle\",\"type\":\"boolean\",\"desc\":\"Indicates if this charge should be exchange to merchant's native currency.\"}]}"
+          "<h3>Update metadata of a team</h3>",
+          "REQ_DEF:{\"path\":\"test\\\\DataController.cs\",\"lines\":\"194-228\",\"title\":\"Update metadata of a team\",\"route\":\"/api/v1.0/teams/{teamId}/metadata\",\"method\":\"PATCH\",\"headers\":{\"Content-Type\":\"application/json\",\"Authorization\":\"Bearer XXX\"},\"body\":[{\"attr\":\"FieldId\",\"type\":\"number\",\"desc\":\"The id of the field\",\"optional\":false},{\"attr\":\"Value\",\"type\":\"string\",\"desc\":\"The value of the vield\",\"optional\":false}],\"rsp_body\":{\"TeamId\":{\"type\":\"string\",\"desc\":\"123-456789-1011121314\"},\"TeamUrl\":{\"type\":\"string\",\"desc\":\"asdf\"},\"MembersCount\":{\"type\":\"int\",\"desc\":\"43\"},\"SharePointUrl\":{\"type\":\"string\",\"desc\":\"asdf\"},\"IconUrl\":{\"type\":\"string\",\"desc\":\"asdf\"},\"DisplayName\":{\"type\":\"string\",\"desc\":\"@My Cool Team\"},\"MailNickname\":{\"type\":\"string\",\"desc\":\"My_Cool_Team\"},\"Description\":{\"type\":\"string\",\"desc\":\"This is my super cool Team\"},\"Visibility\":{\"type\":\"string\",\"desc\":\"public\"},\"CreatedAt\":{\"type\":\"datetime\",\"desc\":\"2023-17-01:10:55:00\"}}}",
+          "Use this endpoint to update one or more field values of a given team",
+          "<br />",
+          "<h3>Get managed Teams</h3>",
+          "REQ_DEF:{\"path\":\"test\\\\DataController.cs\",\"lines\":\"254-283\",\"title\":\"Get managed Teams\",\"route\":\"/api/v1.0/teams/{teamId}/metadata\",\"method\":\"GET\",\"headers\":{\"Content-Type\":\"application/json\",\"Authorization\":\"Bearer XXX\"},\"rsp_body\":{\"TeamId\":{\"type\":\"string\",\"desc\":\"123-456789-1011121314\"},\"TeamUrl\":{\"type\":\"string\",\"desc\":\"asdf\"},\"MembersCount\":{\"type\":\"int\",\"desc\":\"43\"},\"SharePointUrl\":{\"type\":\"string\",\"desc\":\"asdf\"},\"IconUrl\":{\"type\":\"string\",\"desc\":\"asdf\"},\"DisplayName\":{\"type\":\"string\",\"desc\":\"@My Cool Team\"},\"MailNickname\":{\"type\":\"string\",\"desc\":\"My_Cool_Team\"},\"Description\":{\"type\":\"string\",\"desc\":\"This is my super cool Team\"},\"Visibility\":{\"type\":\"string\",\"desc\":\"public\"},\"CreatedAt\":{\"type\":\"datetime\",\"desc\":\"2023-17-01:10:55:00\"}}}",
+          "Use this endpoint to retrieve a list of all field values of a given teams",
+          "<br />",
+          "<h3>Get managed Teams</h3>",
+          "REQ_DEF:{\"path\":\"test\\\\DataController.cs\",\"lines\":\"302-331\",\"title\":\"Get managed Teams\",\"route\":\"/api/v1.0/teams/managed\",\"method\":\"GET\",\"headers\":{\"Content-Type\":\"application/json\",\"Authorization\":\"Bearer XXX\"},\"rsp_body\":{\"TeamId\":{\"type\":\"string\",\"desc\":\"123-456789-1011121314\"},\"TeamUrl\":{\"type\":\"string\",\"desc\":\"asdf\"},\"MembersCount\":{\"type\":\"int\",\"desc\":\"43\"},\"SharePointUrl\":{\"type\":\"string\",\"desc\":\"asdf\"},\"IconUrl\":{\"type\":\"string\",\"desc\":\"asdf\"},\"DisplayName\":{\"type\":\"string\",\"desc\":\"@My Cool Team\"},\"MailNickname\":{\"type\":\"string\",\"desc\":\"My_Cool_Team\"},\"Description\":{\"type\":\"string\",\"desc\":\"This is my super cool Team\"},\"Visibility\":{\"type\":\"string\",\"desc\":\"public\"},\"CreatedAt\":{\"type\":\"datetime\",\"desc\":\"2023-17-01:10:55:00\"}}}",
+          "Use this endpoint to retrieve a list of all managed teams that you are a member of",
+          "<br />",
+          "<h3>Get managed Teams</h3>",
+          "REQ_DEF:{\"path\":\"test\\\\DataController.cs\",\"lines\":\"347-376\",\"title\":\"Get managed Teams\",\"route\":\"/api/v1.0/teams/managed/all\",\"method\":\"GET\",\"headers\":{\"Content-Type\":\"application/json\",\"Authorization\":\"Bearer XXX\"},\"rsp_body\":{\"TeamId\":{\"type\":\"string\",\"desc\":\"123-456789-1011121314\"},\"TeamUrl\":{\"type\":\"string\",\"desc\":\"asdf\"},\"MembersCount\":{\"type\":\"int\",\"desc\":\"43\"},\"SharePointUrl\":{\"type\":\"string\",\"desc\":\"asdf\"},\"IconUrl\":{\"type\":\"string\",\"desc\":\"asdf\"},\"DisplayName\":{\"type\":\"string\",\"desc\":\"@My Cool Team\"},\"MailNickname\":{\"type\":\"string\",\"desc\":\"My_Cool_Team\"},\"Description\":{\"type\":\"string\",\"desc\":\"This is my super cool Team\"},\"Visibility\":{\"type\":\"string\",\"desc\":\"public\"},\"CreatedAt\":{\"type\":\"datetime\",\"desc\":\"2023-17-01:10:55:00\"}}}",
+          "Use this endpoint to retrieve a list of all managed teams",
+          "<br />",
+          "<h3>Get archived teams</h3>",
+          "REQ_DEF:{\"path\":\"test\\\\DataController.cs\",\"lines\":\"400-429\",\"title\":\"Get archived teams\",\"route\":\"/api/v1.0/teams/archived\",\"method\":\"GET\",\"headers\":{\"Content-Type\":\"application/json\",\"Authorization\":\"Bearer XXX\"},\"rsp_body\":{\"TeamId\":{\"type\":\"string\",\"desc\":\"123-456789-1011121314\"},\"TeamUrl\":{\"type\":\"string\",\"desc\":\"asdf\"},\"MembersCount\":{\"type\":\"int\",\"desc\":\"43\"},\"SharePointUrl\":{\"type\":\"string\",\"desc\":\"asdf\"},\"IconUrl\":{\"type\":\"string\",\"desc\":\"asdf\"},\"DisplayName\":{\"type\":\"string\",\"desc\":\"@My Cool Team\"},\"MailNickname\":{\"type\":\"string\",\"desc\":\"My_Cool_Team\"},\"Description\":{\"type\":\"string\",\"desc\":\"This is my super cool Team\"},\"Visibility\":{\"type\":\"string\",\"desc\":\"public\"},\"CreatedAt\":{\"type\":\"datetime\",\"desc\":\"2023-17-01:10:55:00\"}}}",
+          "Use this endpoint to retrieve a list of all archived teams"
         ]
       },
       {
-        "title": "Document",
+        "title": "DEPRECATED",
         "body": [
-          "<h3>Weis was ich</h3>",
-          "asdf",
-          "<ul>",
-          "<li>Hurensohn</li>",
-          "</ul>"
+          "<h3>Get managed Teams</h3>",
+          "REQ_DEF:{\"path\":\"test\\\\DataController.cs\",\"lines\":\"68-89\",\"title\":\"Get managed Teams\",\"route\":\"/CreateTeamDelegatedUnstable\",\"method\":\"POST\",\"headers\":{\"Content-Type\":\"application/json\",\"Authorization\":\"Bearer XXX\"},\"body\":[{\"attr\":\"ApproveDenyComment\",\"type\":\"string\",\"desc\":\"A reason for the approval of the request\",\"optional\":false},{\"attr\":\"AppliedPolicy\",\"type\":\"number\",\"desc\":\"Optional\",\"optional\":false}]}",
+          "Use this endpoint to approve a given request"
+        ]
+      },
+      {
+        "title": "Templates",
+        "body": [
+          "<h3>Save a template</h3>",
+          "REQ_DEF:{\"path\":\"test\\\\DataController.cs\",\"lines\":\"110-130\",\"title\":\"Save a template\",\"route\":\"/api/v1.0/templates\",\"method\":\"POST\",\"headers\":{\"Content-Type\":\"application/json\",\"Authorization\":\"Bearer XXX\"},\"body\":[{\"attr\":\"TeamId\",\"type\":\"string\",\"desc\":\"The team, which will be used for the template\",\"optional\":false}]}",
+          "Use this endpoint to save a given team into a template"
+        ]
+      },
+      {
+        "title": "Requests",
+        "body": [
+          "<h3>Get managed Teams</h3>",
+          "REQ_DEF:{\"path\":\"test\\\\DataController.cs\",\"lines\":\"149-170\",\"title\":\"Get managed Teams\",\"route\":\"/api/v1.0/requests/{requestId}/approve\",\"method\":\"POST\",\"headers\":{\"Content-Type\":\"application/json\",\"Authorization\":\"Bearer XXX\"},\"body\":[{\"attr\":\"ApproveDenyComment\",\"type\":\"string\",\"desc\":\"A reason for the approval of the request\",\"optional\":false},{\"attr\":\"AppliedPolicy\",\"type\":\"number\",\"desc\":\"The policy to be applied\",\"optional\":true}]}",
+          "Use this endpoint to approve a given request"
+        ]
+      },
+      {
+        "title": "Metadata",
+        "body": [
+          "<h3>Get metadata fields</h3>",
+          "REQ_DEF:{\"path\":\"test\\\\DataController.cs\",\"lines\":\"445-472\",\"title\":\"Get metadata fields\",\"route\":\"/api/v1.0/metadata/fields\",\"method\":\"GET\",\"headers\":{\"Content-Type\":\"application/json\",\"Authorization\":\"Bearer XXX\"},\"rsp_status\":{\"200\":\"OK\"},\"rsp_body\":{\"name\":{\"type\":\"string\",\"desc\":\"CoolField\"},\"id\":{\"type\":\"number\",\"desc\":\"25\"}}}",
+          "Use this endpoint to retrieve a list of all metadata fields"
         ]
       }
     ]

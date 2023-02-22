@@ -4,16 +4,16 @@ import path from "path";
 import Fx from "../Utils/Fx";
 import { parse as html } from "node-html-parser";
 import pkg from "../../package.json";
-import { createServer, build } from "vite";
 import react from "@vitejs/plugin-react";
+import vite from "vite";
 
 export interface IConfig {
   logo: string;
   folders: string[];
   apiBase: string;
   productName: string;
+  companyName: string;
   welcome?: string[];
-  hostedAt?: string;
   generatedDefsTitle?: string;
   extraPages?: { title: string; folder: string }[];
   colors?: {
@@ -24,7 +24,28 @@ export interface IConfig {
     secBg?: string;
     onSecBg?: string;
   };
+  explorer?: {
+    type: "graph";
+    client_id: string;
+    redirect_uri: string;
+    scopes: string[];
+    access_token_endpoint: string;
+  };
 }
+
+interface IReqBodyNormal {
+  attr: string;
+  type: string;
+  desc: string;
+}
+interface IReqBodyObj {
+  attr: string;
+  type: "object";
+  desc: string;
+  children: IReqBody[];
+}
+
+type IReqBody = IReqBodyNormal | IReqBodyObj;
 
 interface IReq {
   route: string;
@@ -33,11 +54,7 @@ interface IReq {
   headers: {
     [_: string]: string;
   };
-  body: {
-    attr: string;
-    type: string;
-    desc: string;
-  }[];
+  body: IReqBody[];
 }
 
 interface INode {
@@ -63,7 +80,7 @@ class RESTDoc {
     process.on("uncaughtException", (err) => {
       process.stdout.write("\u001b[3J\u001b[1J");
       console.clear();
-      console.log(err.message);
+      console.log(err.stack || err.message);
       process.exit(1);
     });
   }
@@ -166,79 +183,85 @@ class RESTDoc {
     await this.index(config.folders);
     await this.parseExt(config);
     await this.parse(config, true);
-    chokidar.watch("./config.json").on("change", async () => {
-      process.stdout.write("\u001b[3J\u001b[1J");
-      console.clear();
-      console.log(
-        `\x1b[46m\x1b[30m REBUILD \x1b[0m Config changed. Building...`
-      );
-      const start = new Date().getTime(),
-        content = (await fs.readFile("./config.json")).toString();
-      var newConfig: IConfig;
-      try {
-        newConfig = JSON.parse(content);
-      } catch {
-        return console.log(
-          `\x1b[41m\x1b[30m ERROR \x1b[0m Couldn't parse config!`
+    chokidar
+      .watch(path.join(process.cwd(), "config.json"))
+      .on("change", async () => {
+        process.stdout.write("\u001b[3J\u001b[1J");
+        console.clear();
+        console.log(
+          `\x1b[46m\x1b[30m REBUILD \x1b[0m Config changed. Building...`
         );
-      }
-      try {
-        await this.execConfig(config);
-      } catch (err) {
-        return console.log((err as Error).message);
-      }
+        const start = new Date().getTime(),
+          content = (
+            await fs.readFile(path.join(process.cwd(), "config.json"))
+          ).toString();
+        var newConfig: IConfig;
+        try {
+          newConfig = JSON.parse(content);
+        } catch {
+          return console.log(
+            `\x1b[41m\x1b[30m ERROR \x1b[0m Couldn't parse config!`
+          );
+        }
+        try {
+          await this.execConfig(newConfig);
+        } catch (err) {
+          return console.log((err as Error).message);
+        }
 
-      if (
-        newConfig.folders.some((x) => !config.folders.includes(x)) ||
-        config.folders.some((x) => !newConfig.folders.includes(x))
-      )
-        this.watchFolders(newConfig);
+        if (
+          newConfig.folders.some((x) => !config.folders.includes(x)) ||
+          config.folders.some((x) => !newConfig.folders.includes(x))
+        )
+          this.watchFolders(newConfig);
 
-      if (
-        newConfig.extraPages === undefined &&
-        config.extraPages !== undefined &&
-        this.extraPagesWatch
-      ) {
-        this.extraPagesWatch.close();
-        this.extraPagesWatch = undefined;
-      }
-
-      if (
-        (newConfig.extraPages !== undefined &&
-          config.extraPages === undefined) ||
-        (newConfig.extraPages !== undefined &&
+        if (
+          newConfig.extraPages === undefined &&
           config.extraPages !== undefined &&
-          (newConfig.extraPages.some((x) =>
-            (config.extraPages as NonNullable<typeof config.extraPages>).find(
-              (y) => y.folder === x.folder
-            )
-          ) ||
-            config.extraPages.some((x) =>
-              (
-                newConfig.extraPages as NonNullable<typeof newConfig.extraPages>
-              ).find((y) => y.folder === x.folder)
-            )))
-      )
-        this.watchExtraPages(newConfig);
+          this.extraPagesWatch
+        ) {
+          this.extraPagesWatch.close();
+          this.extraPagesWatch = undefined;
+        }
 
-      config = newConfig;
-      await this.index(config.folders);
-      await this.parseExt(config);
-      await this.parse(config, true);
-      const end = new Date(new Date().getTime() - start);
-      console.log(
-        `\x1b[46m\x1b[30m REBUILD \x1b[0m Done in ${end.getMilliseconds()} ms`
-      );
-    });
+        if (
+          (newConfig.extraPages !== undefined &&
+            config.extraPages === undefined) ||
+          (newConfig.extraPages !== undefined &&
+            config.extraPages !== undefined &&
+            (newConfig.extraPages.some((x) =>
+              (config.extraPages as NonNullable<typeof config.extraPages>).find(
+                (y) => y.folder === x.folder
+              )
+            ) ||
+              config.extraPages.some((x) =>
+                (
+                  newConfig.extraPages as NonNullable<
+                    typeof newConfig.extraPages
+                  >
+                ).find((y) => y.folder === x.folder)
+              )))
+        )
+          this.watchExtraPages(newConfig);
+
+        config = newConfig;
+        await this.index(config.folders);
+        await this.parseExt(config);
+        await this.parse(config, true);
+        const end = new Date(new Date().getTime() - start);
+        console.log(
+          `\x1b[46m\x1b[30m REBUILD \x1b[0m Done in ${end.getMilliseconds()} ms`
+        );
+      });
     config.extraPages && this.watchExtraPages(config);
     this.watchFolders(config);
     await (
-      await createServer({
+      await vite.createServer({
         plugins: [react()],
         server: {
           port: 3000,
         },
-        root: Fx.res("./web"),
+        root: Fx.res(["./web"]),
         logLevel: "silent",
       })
     ).listen();
@@ -328,7 +351,7 @@ class RESTDoc {
     );
     if (!directRender) return;
     await fs.writeFile(
-      "./.web/items.json",
+      Fx.res(["./web/src/items.json"]),
       JSON.stringify(
         [
           {
@@ -346,6 +369,39 @@ class RESTDoc {
       )
     );
   };
+
+  private parseObj = (chunk: string[], prefix?: string): any =>
+    Object.fromEntries(
+      chunk
+        .filter((x) => (prefix ? x.startsWith(prefix) : true))
+        .map((x) =>
+          !prefix &&
+          x.includes(".") &&
+          chunk.find(
+            (y) =>
+              y.startsWith(x.split(".")[0]) && y.split(" | ")[1] === "object"
+          )
+            ? [undefined]
+            : [
+                x.split(" | ")[0].substring(prefix?.length || 0),
+                {
+                  type: x.split(" | ")[1],
+                  desc: x.split(" | ")[2],
+                  ...(x.split(" | ")[1] === "object" &&
+                  chunk.find((y) =>
+                    y.startsWith(`${x.split(" | ")[0]}.${prefix || ""}`)
+                  )
+                    ? {
+                        children: this.parseObj(
+                          chunk,
+                          `${x.split(" | ")[0]}.${prefix || ""}`
+                        ),
+                      }
+                    : {}),
+                },
+              ]
+        )
+    );
 
   private parse = async (config: IConfig, cached?: boolean, path?: string) => {
     var reading = "",
@@ -369,7 +425,7 @@ class RESTDoc {
                     return undefined;
                   }
                   if (
-                    ["DESC", "BODY", "HEADERS"].some(
+                    ["DESC", "BODY", "HEADERS", "RSP_STATUS", "RSP_BODY"].some(
                       (x) => `${x}_START` === y.trim()
                     )
                   ) {
@@ -391,11 +447,9 @@ class RESTDoc {
             [
               ["col", "string"],
               ["title", "string"],
-              ["shortDesc", "string"],
               ["route", "string"],
               ["method", "string"],
               ["desc", "array"],
-              ["body", "array"],
               ["headers", "array"],
             ].every(([k, t]) =>
               t === "array"
@@ -403,30 +457,78 @@ class RESTDoc {
                 : typeof x[k] === t
             )
           )
-          .map((x) => ({
-            title: x.col,
-            body: [
-              `<h3>${x.title}</h3>`,
-              `REQ_DEF:${JSON.stringify({
-                ...(cached ? { path: x.path, lines: x.lines } : {}),
-                route: x.route,
-                method: x.method,
-                shortDesc: x.shortDesc,
-                headers: Object.fromEntries(
-                  x.headers.map((y: string) => [
-                    y.split(" | ")[0],
-                    y.split(" | ").slice(1).join(" | "),
-                  ])
-                ),
-                body: x.body.map((y: string) => ({
-                  attr: y.split(" | ")[0],
-                  type: y.split(" | ")[1],
-                  desc: y.split(" | ").slice(2).join(" | "),
-                })),
-              } as IReq)}`,
-              ...x.desc,
-            ],
-          })),
+          .map((x) => {
+            var obj: string[] = [];
+            const parseBody = (chunk: string, prefix?: string) => {
+              var children = undefined;
+              if (
+                chunk.split(" | ")[1] === "object" &&
+                (children = x.body.filter((y: string) =>
+                  y.split(" | ")[0].startsWith(`${chunk.split(" | ")[0]}.`)
+                )).length
+              ) {
+                obj.push(chunk.split(" | ")[0]);
+                children = children.map((child: string) =>
+                  parseBody(child, chunk.split(" | ")[0])
+                );
+              } else children = undefined;
+              const attr = chunk
+                .split(" | ")[0]
+                .substring(prefix ? prefix.length + 1 : 0);
+              return {
+                attr: attr.trim().startsWith("?") ? attr.slice(1) : attr,
+                type: chunk.split(" | ")[1],
+                desc: chunk.split(" | ").slice(2).join(" | "),
+                optional: attr.trim().startsWith("?"),
+                children,
+              };
+            };
+            return {
+              title: x.col,
+              body: [
+                `<h3>${x.title}</h3>`,
+                `REQ_DEF:${JSON.stringify({
+                  ...(cached ? { path: x.path, lines: x.lines } : {}),
+                  title: x.title,
+                  route: x.route,
+                  method: x.method,
+                  shortDesc: x.shortDesc,
+                  headers: Object.fromEntries(
+                    x.headers.map((y: string) => [
+                      y.split(" | ")[0],
+                      y.split(" | ").slice(1).join(" | "),
+                    ])
+                  ),
+                  ...(x.body
+                    ? {
+                        body: x.body
+                          .map(parseBody)
+                          .filter(
+                            (y: any) =>
+                              !obj.find((z) => y.attr.startsWith(`${z}.`))
+                          ),
+                      }
+                    : {}),
+                  ...(x.rsp_status
+                    ? {
+                        rsp_status: Object.fromEntries(
+                          x.rsp_status.map((y: string) => [
+                            y.split(" | ")[0],
+                            y.split(" | ").slice(1).join(" | "),
+                          ])
+                        ),
+                      }
+                    : {}),
+                  ...(x.rsp_body
+                    ? {
+                        rsp_body: this.parseObj(x.rsp_body),
+                      }
+                    : {}),
+                } as IReq)}`,
+                ...x.desc,
+              ],
+            };
+          }),
         "title",
         "body"
       );
@@ -443,7 +545,7 @@ class RESTDoc {
         content: x,
       })));
     await fs.writeFile(
-      "./.web/items.json",
+      Fx.res(["./web/src/items.json"]),
       JSON.stringify(
         [
           {
@@ -470,9 +572,14 @@ class RESTDoc {
         [() => !config.folders, "folders is required"],
         [() => !config.apiBase, "apiBase is required"],
         [() => !config.productName, "productName is required"],
+        [() => !config.companyName, "companyName is required"],
         [
           () => typeof config.productName !== "string",
           "productName has to be a string",
+        ],
+        [
+          () => typeof config.companyName !== "string",
+          "companyName has to be a string",
         ],
         [
           () =>
@@ -488,12 +595,6 @@ class RESTDoc {
               !Array.isArray(config.welcome) ||
               config.welcome.some((x) => typeof x !== "string")),
           "welcome has to be a string array",
-        ],
-        [
-          () =>
-            config.hostedAt !== undefined &&
-            typeof config.hostedAt !== "string",
-          "hostedAt has to be a string",
         ],
         [
           () =>
@@ -540,6 +641,38 @@ class RESTDoc {
             ),
           "extraPages array has to be objects including folder and title",
         ],
+        [
+          () =>
+            config.explorer &&
+            (typeof config.explorer !== "object" ||
+              Array.isArray(config.explorer)),
+          "explorer has to be Object",
+        ],
+        [
+          () => config.explorer && config.explorer.type !== "graph",
+          "explorer.type has to be 'graph'",
+        ],
+        [
+          () =>
+            config.explorer &&
+            (
+              [
+                "client_id",
+                "redirect_uri",
+                "type",
+                "access_token_endpoint",
+              ] as const
+            ).some((x) => typeof (config.explorer as any)[x] !== "string"),
+          "explorer.client_id, explorer.redirect_uri, explorer.access_token_endpoint and explorer.type have to be a string",
+        ],
+        [
+          () =>
+            config.explorer &&
+            (typeof config.explorer.scopes !== "object" ||
+              !Array.isArray(config.explorer.scopes) ||
+              config.explorer.scopes.some((x) => typeof x !== "string")),
+          "explorer.scopes has to be a string array",
+        ],
       ] as const
     ).forEach(([check, err]) => {
       if (check())
@@ -556,7 +689,9 @@ class RESTDoc {
     // Replacing config
     //
     if (config.colors && Object.entries(config.colors).length) {
-      var colors = (await fs.readFile("./.web/_globals.scss")).toString(),
+      var colors = (
+          await fs.readFile(Fx.res(["./web/src/Utils/_globals.scss"]))
+        ).toString(),
         changed = false;
       const replaceColor = (k: string, v: string) =>
         (colors = colors
@@ -570,28 +705,27 @@ class RESTDoc {
       Object.entries(config.colors).forEach(([k, v]) =>
         replaceColor(`$${k}`, v as string)
       );
-      changed && (await fs.writeFile("./web/src/Utils/_globals.scss", colors));
+      changed &&
+        (await fs.writeFile(Fx.res(["./web/src/Utils/_globals.scss"]), colors));
     }
 
     //
     // Replacing the logo
     //
-    await fs.copyFile(config.logo, "./.web/logo.png");
+    await fs.copyFile(config.logo, Fx.res(["./web/public/logo.png"]));
 
     //
     // Replace internal config
     //
-    if (
-      !(await Fx.fs_utils.exists(
-        path.join(process.cwd(), "./.web/config.json")
-      ))
-    )
-      await fs.copyFile(Fx.res("./config.json"), "./.web/config.json");
+    if (!(await Fx.fs_utils.exists(path.join(process.cwd(), "./config.json"))))
+      await fs.copyFile(Fx.res(["./example.json"]), "./config.json");
     var internalConfig = JSON.parse(
-        (await fs.readFile("./.web/config.json")).toString()
+        (await fs.readFile(Fx.res(["./web/src/config.json"]))).toString()
       ),
       changed = false;
-    (["welcome", "hostedAt", "apiBase", "productName"] as const).forEach(
+    (
+      ["welcome", "apiBase", "productName", "companyName", "explorer"] as const
+    ).forEach(
       (x) => config[x] && (changed = true) && (internalConfig[x] = config[x])
     );
     internalConfig.apiBase = internalConfig.apiBase.slice(
@@ -599,16 +733,16 @@ class RESTDoc {
     );
     changed &&
       (await fs.writeFile(
-        "./.web/config.json",
+        Fx.res(["./web/src/config.json"]),
         JSON.stringify(internalConfig, null, 2)
       ));
   };
 
   private buildInternal = () =>
-    build({
-      root: "./web",
+    vite.build({
+      root: Fx.res(["./web"]),
       build: {
-        outDir: "./build",
+        outDir: path.join(process.cwd(), "./docs"),
       },
       base: "./",
       logLevel: "silent",

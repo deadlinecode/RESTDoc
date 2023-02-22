@@ -1,0 +1,189 @@
+@import "../../Utils/globals";
+
+#Engine {
+  height: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  .Header {
+    display: flex;
+    height: 35px;
+    button {
+      height: 35px;
+    }
+    input {
+      background-color: black;
+      border: 1px solid rgba($color: white, $alpha: 0.7);
+      border-radius: 5px;
+      margin-left: 10px;
+      padding-left: 10px;
+      padding-right: 10px;
+      &:focus {
+        border-color: white;
+      }
+    }
+    div.box {
+      padding: 8px 10px;
+      margin-right: 10px;
+      box-sizing: border-box;
+      height: min-content;
+      background-color: transparent;
+      border: 1px solid rgba($color: white, $alpha: 0.7);
+      border-radius: 5px;
+      width: max-content;
+      font-size: 14px;
+      &.method {
+        width: 70px;
+        height: 35px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 15px;
+        border: none;
+        color: black;
+        font-weight: 900;
+        border: 1px solid rgba($color: white, $alpha: 0.7);
+        &.method-GET {
+          background-color: $blue;
+        }
+        &.method-POST {
+          background-color: $green;
+        }
+        &.method-PUT {
+          background-color: $orange;
+        }
+        &.method-DELETE {
+          background-color: $red;
+        }
+        &.method-PATCH {
+          background-color: $yellow;
+        }
+      }
+    }
+  }
+  .Tabs {
+    margin-top: 20px;
+    min-height: 40%;
+    height: 40%;
+    display: flex;
+    flex-direction: column;
+    &__Header {
+      display: flex;
+      &__Item {
+        padding: 10px 40px;
+        box-sizing: border-box;
+        cursor: pointer;
+        transition: 0.2s ease-in-out;
+        &:hover {
+          background-color: rgba($color: white, $alpha: 0.2);
+        }
+        &.active {
+          background-color: transparent;
+          border-bottom: 1px solid $sec;
+          color: $sec;
+          font-weight: 900;
+        }
+      }
+    }
+    &__Body {
+      padding: 10px;
+      box-sizing: border-box;
+      overflow: auto;
+      flex-grow: 1;
+      #BodyInput, #URLInput {
+        .table {
+          display: grid;
+          grid-template-columns: auto auto;
+          &__item {
+            padding: 15px;
+            box-sizing: border-box;
+            border-right: 1px solid rgba($color: white, $alpha: 0.3);
+            border-bottom: 1px solid rgba($color: white, $alpha: 0.3);
+            &:nth-child(even) {
+              border-right: none;
+            }
+            &:nth-last-of-type(-n + 2) {
+              border-bottom: none;
+            }
+          }
+          &__input {
+            width: 100%;
+            input {
+              background-color: transparent;
+              width: 100%;
+              border: none;
+            }
+          }
+        }
+      }
+    }
+  }
+  .Response {
+    border-top: 1px solid rgba($color: white, $alpha: 0.3);
+    box-sizing: border-box;
+    margin-top: 10px;
+    padding: 10px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    &__body {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      height: 0px;
+    }
+  }
+}
+
+.checkbox_container {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 22px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+  .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background-color: rgba($color: white, $alpha: 0.2);
+    border-radius: 5px;
+    transition: 0.1s ease-in-out;
+    border: 2px solid transparent;
+    &::after {
+      content: "";
+      position: absolute;
+      display: none;
+      left: 6px;
+      top: 2px;
+      width: 5px;
+      height: 10px;
+      border: solid $sec;
+      border-width: 0 2px 2px 0;
+      -webkit-transform: rotate(45deg);
+      -ms-transform: rotate(45deg);
+      transform: rotate(45deg);
+    }
+  }
+  &:hover input ~ .checkmark {
+    background-color: rgba($color: white, $alpha: 0.3);
+  }
+  input:checked ~ .checkmark {
+    border-color: $sec;
+  }
+  input:checked ~ .checkmark::after {
+    display: block;
+  }
+}

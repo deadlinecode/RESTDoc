@@ -6,7 +6,20 @@
     "<b>The docs are organized into four main groups:</b>",
     "<ul><a href=''><li>Charges</li></a><a href=''><li>Withdrawals</li></a><a href=''><li>Rates</li></a><a href=''><li>Currencies</li></a></ul>"
   ],
-  "productName": "Teams Manager",
-  "hostedAt": "/",
-  "apiBase": "https://api.opennode.co"
+  "productName": "Teams Manager API",
+  "hostedAt": "/docs",
+  "apiBase": "SAME_ORIGIN",
+  "companyName": "Solutions2Share",
+  "explorer": {
+    "type": "graph",
+    "client_id": "7e4279aa-69ca-40a2-a9d7-6f5c1a6ca6d0",
+    "redirect_uri": "https://mbxx-app-teamsmgrback.azurewebsites.net/docs",
+    "access_token_endpoint": "https://mbxx-app-teamsmgrback.azurewebsites.net/generateDocsAccessToken",
+    "scopes": [
+      "https://graph.microsoft.com/User.Read.All",
+      "https://graph.microsoft.com/Directory.Read.All",
+      "https://graph.microsoft.com/Group.ReadWrite.All",
+      "https://graph.microsoft.com/Mail.Send"
+    ]
+  }
 }

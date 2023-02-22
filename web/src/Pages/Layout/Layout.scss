@@ -15,14 +15,15 @@
     box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px,
       rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px,
       rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+    position: relative;
     &__Logo {
       display: flex;
       align-items: center;
       margin-bottom: 50px;
       * {
-        font-weight: 500;
+        font-weight: 200;
         color: white;
-        font-size: 20px;
+        font-size: 18px;
       }
       img {
         width: 40px;
@@ -62,6 +63,34 @@
         }
       }
     }
+    &__Explorer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 45px;
+      border-top: 1px solid rgba($color: white, $alpha: 0.1);
+      overflow: hidden;
+      button {
+        background: transparent;
+        width: 100%;
+        height: 100%;
+        border: none;
+        color: white;
+        font-size: 15px;
+        cursor: pointer;
+        transition: 0.1s ease-in-out;
+        user-select: none;
+        &:hover {
+          transform: scale(1.1);
+          color: $sec;
+        }
+        &:disabled {
+          opacity: 0.5;
+          pointer-events: none;
+        }
+      }
+    }
   }
   .Examplebar {
     height: 100%;
@@ -74,6 +103,24 @@
     box-sizing: border-box;
     transform: translateX(100%);
     overflow-y: auto;
+    z-index: 3;
+    &__ActiveObj {
+      z-index: 2;
+      height: 100%;
+      $width: 400px;
+      width: $width;
+      border-right: 1px solid rgba($color: white, $alpha: 0.1);
+      background-color: $secBg;
+      position: absolute;
+      top: 0;
+      right: 0;
+      box-sizing: border-box;
+      overflow-y: auto;
+      transition: $ExamplebarTime ease-in-out;
+      transform: translateX(100%);
+      display: flex;
+      align-items: center;
+    }
     .section {
       margin: 0 30px;
     }
@@ -89,6 +136,12 @@
     }
     &.active {
       transform: none;
+      & + .Examplebar__ActiveObj {
+        transform: none;
+      }
+      & + .Examplebar__ActiveObj.active {
+        transform: translateX($ExamplebarWidth * -1);
+      }
     }
     .req-route {
       font-family: "Courier New", Courier, monospace;
@@ -157,28 +210,72 @@
         }
       }
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      table-layout: fixed;
-      $leftSide: 40%;
-      * {
-        color: white;
-      }
-      thead tr th,
-      tbody tr td {
-        text-align: left;
-        vertical-align: top;
-        padding: 15px 20px;
-        width: 100% - $leftSide;
-      }
+  }
 
-      thead tr th {
-        border-bottom: 1px solid rgba($color: white, $alpha: 0.25);
-        font-size: 16px;
-        font-weight: 100;
+  footer {
+    position: absolute;
+    bottom: 0;
+    left: $SidebarWidth;
+    width: calc(100% - $SidebarWidth);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 45px;
+    background-color: $bg;
+    border-top: 1px solid rgba($color: white, $alpha: 0.2);
+    font-size: 15px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    $leftSide: 40%;
+    * {
+      color: white;
+    }
+    thead tr th,
+    tbody tr td {
+      text-align: left;
+      vertical-align: top;
+      padding: 15px 20px;
+      width: 100% - $leftSide;
+    }
+
+    thead tr th {
+      border-bottom: 1px solid rgba($color: white, $alpha: 0.25);
+      font-size: 16px;
+      font-weight: 100;
+    }
+    thead tr th:first-child,
+    tbody tr td:first-child {
+      text-align: right;
+      width: $leftSide;
+    }
+    tbody tr td:last-child {
+      color: #868788;
+      font-size: 15px;
+    }
+    tbody tr td:first-child {
+      font-family: "Courier New", Courier, monospace;
+      span {
+        display: block;
+        font-family: "Courier New", Courier, monospace;
+        color: #868788;
+        &.obj {
+          text-decoration: underline dotted 2px;
+          text-decoration-color: $sec;
+          transition: 0.1s ease-in-out;
+          cursor: pointer;
+          &:hover {
+            color: $sec;
+            text-decoration: underline 2px;
+          }
+        }
       }
-      tbody tr td {
+    }
+    tbody tr {
+      td {
         border-bottom: 1px solid rgba($color: white, $alpha: 0.1);
         code {
           display: block;
@@ -189,30 +286,33 @@
           border-radius: 5px;
           margin-top: 5px;
         }
+        .activeObj {
+          position: absolute;
+          transform: rotate(180deg) translateY(50%);
+          top: 50%;
+          left: 20px;
+          height: 20px;
+          svg {
+            height: 100%;
+            fill: white;
+          }
+        }
       }
-      thead tr th:first-child,
-      tbody tr td:first-child {
-        text-align: right;
-        width: $leftSide;
-      }
-      tbody tr td:last-child {
-        color: #868788;
-        font-size: 15px;
-      }
-      tbody tr td:first-child {
-        font-family: "Courier New", Courier, monospace;
-        span {
-          display: block;
-          font-family: "Courier New", Courier, monospace;
-          color: #868788;
+      transition: 0.1s ease-in-out;
+      position: relative;
+      &.active {
+        background-color: $sec;
+        * {
+          color: white !important;
         }
       }
     }
   }
   main {
-    height: 100%;
+    height: calc(100% - 50px);
     width: calc(100% - $SidebarWidth);
     transition: width $ExamplebarTime ease-in-out;
+    overflow-y: auto;
     &.examplebar-active {
       width: calc(100% - ($SidebarWidth + $ExamplebarWidth));
     }
@@ -226,7 +326,7 @@
       opacity: 0.9;
     }
     h1 {
-      font-weight: 900;
+      font-weight: 600;
       color: white;
     }
     ul {
@@ -250,6 +350,7 @@
       border-radius: 5px;
       position: relative;
       margin-bottom: 5px;
+      cursor: pointer;
       &.active {
         background-color: $pri;
       }
@@ -309,7 +410,6 @@
         top: 50%;
         right: 10px;
         transform: translateY(-50%);
-        cursor: pointer;
         width: 30px;
         height: 30px;
         display: flex;

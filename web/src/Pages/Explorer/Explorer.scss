@@ -1,0 +1,27 @@
+@import "../../Utils/globals";
+
+#Explorer {
+  position: relative;
+  button {
+    border-radius: 5px;
+    background-color: transparent;
+    color: $sec;
+    border: 1px solid $sec;
+    padding: 7px 10px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.1s ease-in-out;
+    user-select: none;
+    .load_wrapper {
+      transform: scale(0.4);
+    }
+    &:hover {
+      background-color: $sec;
+      color: black;
+    }
+    &:disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  }
+}

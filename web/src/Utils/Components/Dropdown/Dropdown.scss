@@ -1,0 +1,57 @@
+@import "../../globals";
+
+.Dropdown {
+  position: relative;
+  width: max-content;
+  transition: 0.2s ease-in-out;
+  height: 35px;
+  button {
+    border: 1px solid rgba($color: white, $alpha: 0.7) !important;
+    color: rgba($color: white, $alpha: 0.7) !important;
+    padding-left: 40px !important;
+    position: relative;
+    width: 100%;
+    min-width: 250px;
+    text-align: left;
+    svg {
+      height: 18px;
+      fill: rgba($color: white, $alpha: 0.7);
+      position: absolute;
+      left: 14px;
+      top: 7px;
+      transform: rotate(90deg);
+    }
+  }
+  &__List {
+    background-color: $secBg;
+    margin-top: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+    transform-origin: top;
+    transform: scaleY(0);
+    opacity: 0;
+    transition: opacity 0.1s ease-in-out, transform 0.2s ease-in-out;
+    max-height: 300px;
+    overflow-y: auto;
+    &.active {
+      transition: opacity 0.2s ease-in-out, transform 0.1s ease-in-out;
+      transform: scaleY(1);
+      opacity: 1;
+    }
+    &__Item {
+      padding: 7px 10px;
+      padding-left: 40px;
+      border-bottom: 1px solid black;
+      box-sizing: border-box;
+      cursor: pointer;
+      transition: 0.1s ease-in-out;
+      &:hover {
+        background-color: $sec;
+        color: black;
+      }
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+}

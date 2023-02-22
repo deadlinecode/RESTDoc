@@ -24,3 +24,9 @@ yarn-error.log*
 /web/node_modules
 release/**/*
 build/release/**/*
+docs/**/*
+web/.cache
+test/**/*
+tests/**/*
+testPages/**/*
+web/docs/**/*

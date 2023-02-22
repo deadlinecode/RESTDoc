@@ -16,10 +16,8 @@ class Fx {
     },
   };
 
-  res = (relativePath: string) =>
-    path.resolve(
-      path.join(path.dirname((require.main as any).filename), "..", relativePath)
-    );
+  res = (pth: string[]) =>
+    path.join(require.main?.path as string, "..", ...pth);
 
   mergeNodes = (arr: any[], sep: string, merge: string) => {
     const clone: any[] = [];

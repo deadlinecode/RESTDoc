@@ -1,26 +1,46 @@
 import * as React from "react";
 import { HashRouter, Redirect, Route, Switch } from "react-router-dom";
-import config from "../../../../.web/config.json";
+import config from "../../config.json";
 import Fx from "../../Utils/Fx";
-import paragraphs from "../../../../.web/items.json";
+import paragraphs from "../../items.json";
 import "./Layout.scss";
 import Icon from "../../Utils/Components/Icon/Icon";
-import logo from "../../../../.web/logo.png";
+import logo from "../../../public/logo.png";
+import Explorer from "../Explorer/Explorer";
 
-interface IReq {
+interface IReqBodyBase {
+  attr: string;
+  type: string;
+  desc: string;
+  optional: boolean;
+}
+interface IReqBody extends IReqBodyBase {
+  children?: IReqBody[];
+}
+
+interface IReqRspBody {
+  [_: string]: {
+    type: string;
+    desc: string;
+    children?: IReqRspBody;
+  };
+}
+
+export interface IReq {
   path?: string;
   lines?: string;
   route: string;
   method: "POST" | "GET" | "PUT" | "PATCH" | "DELETE";
   shortDesc: string;
   headers: {
-    [_: string]: string;
+    [key: string]: string;
   };
-  body: {
-    attr: string;
-    type: string;
-    desc: string;
-  }[];
+  body: IReqBody[];
+  rsp_body?: IReqRspBody;
+  rsp_status?: {
+    [status: string]: string;
+  };
+  title: string;
 }
 
 export interface ILayoutProps {}
@@ -28,6 +48,7 @@ export interface ILayoutProps {}
 export interface ILayoutState {
   showExamplebar: boolean;
   activeReq?: IReq;
+  activeReqBodyObj?: IReqBody;
 }
 
 export default class Layout extends React.Component<
@@ -75,7 +96,12 @@ export default class Layout extends React.Component<
               onClick={() =>
                 (window.location.hash = `/${encodeURIComponent(
                   x.title.toLowerCase()
-                )}/${encodeURIComponent(y.title.toLowerCase())}`)
+                )}/${encodeURIComponent(y.title.toLowerCase())}`) &&
+                this.setState({
+                  showExamplebar: false,
+                  activeReq: undefined,
+                  activeReqBodyObj: undefined,
+                })
               }
             >
               {y.title}
@@ -88,11 +114,19 @@ export default class Layout extends React.Component<
   renderReq = (req: IReq) => {
     return (
       <div
+        onClick={() =>
+          this.setState({
+            activeReq: req,
+            activeReqBodyObj: undefined,
+            showExamplebar: true,
+          })
+        }
         className={Fx.c([
           "Request_Component",
           this.state.showExamplebar &&
             this.state.activeReq &&
             this.state.activeReq.route === req.route &&
+            this.state.activeReq.method === req.method &&
             "active",
         ])}
       >
@@ -110,12 +144,7 @@ export default class Layout extends React.Component<
             <span className="req-short-desc">{req.shortDesc}</span>
           </span>
         </div>
-        <div
-          className="req-open-example"
-          onClick={() =>
-            this.setState({ activeReq: req, showExamplebar: true })
-          }
-        >
+        <div className="req-open-example">
           <Icon icon="chevron-right" />
         </div>
         {req.path && (
@@ -171,13 +200,41 @@ export default class Layout extends React.Component<
     );
   };
 
+  renderRsp = (rsp: IReqRspBody, alignLvL = 0) =>
+    Object.entries(rsp).map(([k, v], i) => (
+      <div key={i} className="req-rsp">
+        {v.children ? (
+          <div className="align">
+            {new Array(alignLvL)
+              .fill(0)
+              .map(() => <>&nbsp;</>)
+              .join("")}
+            {`${k}: {`}
+            <div>{this.renderRsp(v.children, alignLvL + 2)}</div>
+            {new Array(alignLvL)
+              .fill(0)
+              .map(() => <>&nbsp;</>)
+              .join("")}
+            {`},`}
+          </div>
+        ) : (
+          <>
+            {new Array(alignLvL).fill(0).map(() => (
+              <>&nbsp;</>
+            ))}
+            {`${k}[${v.type}]: ${v.desc},`}
+          </>
+        )}
+      </div>
+    ));
+
   public render() {
     const isWelcome =
       config.welcome &&
       typeof config.welcome === "object" &&
       Array.isArray(config.welcome);
     return (
-      <HashRouter basename={config.hostedAt}>
+      <HashRouter>
         <Switch>
           <Route
             path="/:route"
@@ -217,7 +274,12 @@ export default class Layout extends React.Component<
                               "active",
                           ])}
                           onClick={() =>
-                            (window.location.hash = "/welcome/introduction")
+                            (window.location.hash = "/welcome/introduction") &&
+                            this.setState({
+                              showExamplebar: false,
+                              activeReq: undefined,
+                              activeReqBodyObj: undefined,
+                            })
                           }
                         >
                           Introduction
@@ -229,20 +291,31 @@ export default class Layout extends React.Component<
                     props.match.params.route,
                     props.match.params.item
                   )}
+                  <div className="Sidebar__Explorer">
+                    <button
+                      onClick={() => (window.location.hash = "#/explorer/init")}
+                    >
+                      Try it out 😄
+                    </button>
+                  </div>
                 </div>
                 <main
                   className={Fx.c([
                     this.state.showExamplebar && "examplebar-active",
                   ])}
                 >
-                  {isWelcome &&
-                  props.match.params.route === "welcome" &&
-                  props.match.params.item === "introduction"
-                    ? this.renderWelcome()
-                    : this.renderRoute(
-                        props.match.params.route,
-                        props.match.params.item
-                      )}
+                  {props.match.params.route === "explorer" ? (
+                    <Explorer page={props.match.params.item} />
+                  ) : isWelcome &&
+                    props.match.params.route === "welcome" &&
+                    props.match.params.item === "introduction" ? (
+                    this.renderWelcome()
+                  ) : (
+                    this.renderRoute(
+                      props.match.params.route,
+                      props.match.params.item
+                    )
+                  )}
                 </main>
                 <div
                   className={Fx.c([
@@ -263,7 +336,7 @@ export default class Layout extends React.Component<
                       return (
                         <>
                           <div className="section">
-                            <h1>{req.shortDesc}</h1>
+                            <h1>{req.title}</h1>
                           </div>
                           <hr />
                           <div className="section">
@@ -277,65 +350,229 @@ export default class Layout extends React.Component<
                                 {req.method.toUpperCase()}
                               </span>
                               <span className="req-route">
-                                {config.apiBase}
+                                {config.apiBase === "SAME_ORIGIN"
+                                  ? window.location.origin
+                                  : config.apiBase}
                                 {req.route}
                               </span>
                             </div>
-                            <br />
-                            <br />
-                            <br />
-                            <br />
-                            <h3>Request</h3>
-                            <table>
-                              <thead>
-                                <tr>
-                                  <th>Attribute</th>
-                                  <th>Description</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {req.body.map((x, i) => (
-                                  <tr key={i}>
-                                    <td>
-                                      {x.attr}
-                                      <span>{x.type}</span>
-                                    </td>
-                                    <td>
-                                      {x.desc.split("`")[0]}
-                                      {x.desc.split("`").length > 1 && (
-                                        <code>
-                                          {x.desc.split("`").slice(1).join("")}
-                                        </code>
-                                      )}
-                                    </td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
+                            {req.body && req.body.length !== 0 && (
+                              <>
+                                <br />
+                                <br />
+                                <br />
+                                <br />
+                                <h3>Request</h3>
+                                <table>
+                                  <thead>
+                                    <tr>
+                                      <th>Attribute</th>
+                                      <th>Description</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {req.body.map((x, i) => (
+                                      <tr
+                                        key={i}
+                                        className={Fx.c([
+                                          this.state.activeReqBodyObj &&
+                                            x.attr ===
+                                              this.state.activeReqBodyObj
+                                                .attr &&
+                                            "active",
+                                        ])}
+                                      >
+                                        <td>
+                                          {this.state.activeReqBodyObj &&
+                                            x.attr ===
+                                              this.state.activeReqBodyObj
+                                                .attr &&
+                                            "active" && (
+                                              <div className="activeObj">
+                                                <Icon icon="chevron-right" />
+                                              </div>
+                                            )}
+                                          {x.attr}
+                                          <span
+                                            onClick={() =>
+                                              x.type === "object" &&
+                                              x.children &&
+                                              this.setState({
+                                                activeReqBodyObj:
+                                                  this.state.activeReqBodyObj &&
+                                                  this.state.activeReqBodyObj
+                                                    .attr === x.attr
+                                                    ? undefined
+                                                    : x,
+                                              })
+                                            }
+                                            className={Fx.c([
+                                              x.type === "object" &&
+                                                x.children &&
+                                                "obj",
+                                            ])}
+                                          >
+                                            {x.optional && "[optional] "}
+                                            {x.type}
+                                          </span>
+                                        </td>
+                                        <td>
+                                          {x.desc.split("`")[0]}
+                                          {x.desc.split("`").length > 1 && (
+                                            <code>
+                                              {x.desc
+                                                .split("`")
+                                                .slice(1)
+                                                .join("")
+                                                .split("\\n")
+                                                .map((y) => (
+                                                  <>
+                                                    {y}
+                                                    <br />
+                                                  </>
+                                                ))}
+                                            </code>
+                                          )}
+                                        </td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </>
+                            )}
                             <br />
                             <br />
                             <br />
                             <h3>Headers</h3>
                             <code className="headers">
                               {Object.entries(req.headers).map(([k, v], i) => (
-                                <div>
+                                <div key={i}>
                                   <span className="k">{k}</span>:{" "}
                                   <span className="v">{v}</span>
                                 </div>
                               ))}
                             </code>
+                            <br />
+                            <br />
+                            <br />
+                            <h3>Response</h3>
+                            {req.rsp_status && (
+                              <>
+                                <br />
+                                <h4>Status codes</h4>
+                                {Object.entries(req.rsp_status).map(
+                                  ([k, v], i) => (
+                                    <div
+                                      key={i}
+                                      style={{
+                                        boxSizing: "border-box",
+                                        paddingLeft: "10px",
+                                      }}
+                                    >
+                                      <b>{k}</b> - {v}
+                                    </div>
+                                  )
+                                )}
+                              </>
+                            )}
+                            {req.rsp_body && (
+                              <>
+                                <br />
+                                <h4>Body</h4>
+                                <code className="headers">
+                                  {this.renderRsp(req.rsp_body)}
+                                </code>
+                              </>
+                            )}
                           </div>
                         </>
                       );
                     })()}
                   </div>
                 </div>
+                <div
+                  className={Fx.c([
+                    "Examplebar__ActiveObj",
+                    this.state.activeReqBodyObj && "active",
+                  ])}
+                >
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Attribute</th>
+                        <th>Description</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(this.state.activeReqBodyObj?.children || []).map(
+                        (x, i) => (
+                          <tr
+                            key={i}
+                            className={Fx.c([
+                              this.state.activeReqBodyObj &&
+                                x.attr === this.state.activeReqBodyObj.attr &&
+                                "active",
+                            ])}
+                          >
+                            <td>
+                              {this.state.activeReqBodyObj &&
+                                x.attr === this.state.activeReqBodyObj.attr &&
+                                "active" && (
+                                  <div className="activeObj">
+                                    <Icon icon="chevron-right" />
+                                  </div>
+                                )}
+                              {x.attr}
+                              <span
+                                onClick={() =>
+                                  x.type === "object" &&
+                                  x.children &&
+                                  this.setState({
+                                    activeReqBodyObj:
+                                      this.state.activeReqBodyObj &&
+                                      this.state.activeReqBodyObj.attr ===
+                                        x.attr
+                                        ? undefined
+                                        : x,
+                                  })
+                                }
+                                className={Fx.c([
+                                  x.type === "object" && x.children && "obj",
+                                ])}
+                              >
+                                {x.type}
+                                {x.optional && " [optional]"}
+                              </span>
+                            </td>
+                            <td>
+                              {x.desc.split("`")[0]}
+                              {x.desc.split("`").length > 1 && (
+                                <code>
+                                  {x.desc.split("`").slice(1).join("")}
+                                </code>
+                              )}
+                            </td>
+                          </tr>
+                        )
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                <footer>
+                  &copy; {config.companyName} {new Date().getFullYear()}
+                </footer>
               </div>
             )}
           />
           <Route
             path="*"
-            render={() => <Redirect to="/welcome/introduction" />}
+            render={(props) => {
+              var code = new URLSearchParams(window.location.search).get(
+                "code"
+              );
+              if (code) return window.opener.closePopup(code);
+              return <Redirect to="/welcome/introduction" />;
+            }}
           />
         </Switch>
       </HashRouter>
